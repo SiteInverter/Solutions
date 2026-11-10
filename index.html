@@ -1,0 +1,726 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyAI — Your Personal Study Assistant</title>
+
+<style>
+:root {
+  --blue: #4269ed;
+  --blue-light: #edf2ff;
+  --ink: #202638;
+  --muted: #8790a3;
+  --line: #e9edf4;
+  --bg: #f7f8fb;
+  --white: #fff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+button, input, textarea { font: inherit; }
+
+button { cursor: pointer; }
+
+.app {
+  max-width: 1450px;
+  margin: auto;
+  min-height: 100vh;
+}
+
+/* HEADER */
+
+header {
+  height: 72px;
+  background: white;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--blue);
+  color: white;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status {
+  color: #238b63;
+  background: #eaf8f1;
+  border-radius: 20px;
+  padding: 8px 13px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e8edff;
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+}
+
+/* MAIN */
+
+main {
+  padding: 38px 5%;
+}
+
+.intro { margin-bottom: 28px; }
+
+.intro h1 {
+  font-size: clamp(27px, 4vw, 38px);
+  letter-spacing: -1.5px;
+  margin: 0 0 9px;
+}
+
+.intro p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* WORKSPACE */
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, .85fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  overflow: hidden;
+}
+
+.panel-heading {
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-heading h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.panel-heading span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* UPLOAD */
+
+.upload-area {
+  margin: 20px;
+  min-height: 230px;
+  border: 2px dashed #dce3f0;
+  border-radius: 14px;
+  background: #fafbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-content { max-width: 300px; }
+
+.upload-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  background: var(--blue-light);
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  font-size: 27px;
+  margin: 0 auto 15px;
+}
+
+.upload-area h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.upload-area p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.upload-actions {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.primary, .secondary {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 17px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.primary {
+  background: var(--blue);
+  color: white;
+}
+
+.primary:hover { background: #3155d4; }
+
+.secondary {
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+#preview {
+  display: none;
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.file-input { display: none; }
+
+.upload-area.dragover {
+  border-color: var(--blue);
+  background: var(--blue-light);
+}
+
+/* SOLUTION */
+
+.solution-section { padding: 0 20px 22px; }
+
+.section-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  font-weight: 800;
+  margin: 5px 0 14px;
+}
+
+.problem-box {
+  padding: 17px;
+  background: #f8f9fc;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 1.7;
+  min-height: 70px;
+  white-space: pre-wrap;
+}
+
+.steps {
+  display: grid;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.step {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.step-number {
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 7px;
+}
+
+.step p {
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 0;
+  color: #596174;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  padding: 25px 10px;
+}
+
+.solution-buttons {
+  display: flex;
+  gap: 9px;
+  margin-top: 17px;
+  flex-wrap: wrap;
+}
+
+.solution-buttons button { flex: 1; }
+
+/* ASSISTANT */
+
+.assistant {
+  position: sticky;
+  top: 92px;
+}
+
+.assistant-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.ai-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--blue-light);
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  font-size: 18px;
+}
+
+.assistant-heading h2 {
+  font-size: 15px;
+  margin: 0 0 4px;
+}
+
+.assistant-heading p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.chat-body {
+  padding: 17px;
+  height: 370px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.message {
+  max-width: 90%;
+  padding: 12px 14px;
+  border-radius: 13px;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.bot {
+  background: #f2f4f9;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.user {
+  background: var(--blue);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-input-area {
+  border-top: 1px solid var(--line);
+  padding: 13px;
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-form input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: #fafbfc;
+  padding: 12px;
+  border-radius: 10px;
+  outline: none;
+  font-size: 12px;
+}
+
+.chat-form input:focus { border-color: var(--blue); }
+
+.send {
+  width: 43px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--blue);
+  color: white;
+  font-size: 17px;
+}
+
+.chat-note {
+  color: var(--muted);
+  font-size: 10px;
+  margin: 9px 2px 0;
+}
+
+/* FOOTER */
+
+footer {
+  text-align: center;
+  padding: 30px 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* MOBILE */
+
+@media(max-width: 850px) {
+  main { padding: 27px 4%; }
+  .workspace { grid-template-columns: 1fr; }
+  .assistant { position: static; }
+  .chat-body { height: 300px; }
+}
+
+@media(max-width: 450px) {
+  header { padding: 0 4%; height: 64px; }
+  .logo { font-size: 19px; }
+  .status { font-size: 10px; padding: 7px 9px; }
+  .intro h1 { font-size: 28px; }
+  .panel-heading { padding: 17px; }
+  .upload-area { margin: 13px; min-height: 220px; }
+  .solution-section { padding: 0 13px 17px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">S</div>
+    StudyAI
+  </div>
+
+  <div class="header-right">
+    <div class="status">● Study mode</div>
+    <div class="avatar">S</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="intro">
+    <h1>Let's figure it out.</h1>
+    <p>Upload a question, understand the solution, and learn something new.</p>
+  </div>
+
+  <div class="workspace">
+
+    <!-- MAIN STUDY AREA -->
+    <section class="panel">
+
+      <div class="panel-heading">
+        <h2>Problem workspace</h2>
+        <span>01 / New session</span>
+      </div>
+
+      <div class="upload-area" id="dropArea">
+
+        <div class="upload-content" id="uploadContent">
+          <div class="upload-icon">▧</div>
+          <h3>Upload your question</h3>
+          <p>Take a photo of your homework or choose an image from your gallery.</p>
+
+          <div class="upload-actions">
+            <button class="primary" id="cameraButton">📷 Take photo</button>
+            <button class="secondary" id="galleryButton">Choose image</button>
+          </div>
+        </div>
+
+        <img id="preview" alt="Uploaded homework preview">
+      </div>
+
+      <input type="file" accept="image/*" capture="environment"
+             class="file-input" id="cameraInput">
+
+      <input type="file" accept="image/*"
+             class="file-input" id="galleryInput">
+
+      <div class="solution-section">
+
+        <div class="section-label">Your question</div>
+
+        <div class="problem-box" id="problem">
+          Your uploaded question will appear here.
+        </div>
+
+        <div class="section-label" style="margin-top:23px">
+          Step-by-step solution
+        </div>
+
+        <div id="steps">
+          <div class="empty">
+            Your solution will appear here once you submit a question.
+          </div>
+        </div>
+
+        <div class="solution-buttons">
+          <button class="primary" id="solveButton">
+            ✦ Solve question
+          </button>
+          <button class="secondary" id="regenerateButton">
+            ↻ Regenerate
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- AI ASSISTANT -->
+    <aside class="panel assistant">
+
+      <div class="panel-heading">
+        <div class="assistant-heading">
+          <div class="ai-icon">✦</div>
+          <div>
+            <h2>StudyAI Assistant</h2>
+            <p>Here to help you understand.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-body" id="chatBody">
+        <div class="message bot">
+          Hello! I'm your StudyAI assistant.
+
+          Upload a question and I'll help you understand it. You can also ask me why a particular step works.
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <form class="chat-form" id="chatForm">
+          <input id="chatInput"
+                 placeholder="Ask me anything..."
+                 autocomplete="off">
+          <button class="send" type="submit">➤</button>
+        </form>
+        <p class="chat-note">StudyAI can make mistakes. Check important answers.</p>
+      </div>
+
+    </aside>
+
+  </div>
+</main>
+
+<footer>
+  STUDYAI © 2026 · Learn at your own pace.
+</footer>
+
+</div>
+
+<script>
+const cameraInput = document.getElementById("cameraInput");
+const galleryInput = document.getElementById("galleryInput");
+const preview = document.getElementById("preview");
+const uploadContent = document.getElementById("uploadContent");
+const dropArea = document.getElementById("dropArea");
+const problem = document.getElementById("problem");
+const steps = document.getElementById("steps");
+const chatBody = document.getElementById("chatBody");
+
+let uploadedFile = null;
+let currentQuestion = "";
+
+// CAMERA AND GALLERY
+
+document.getElementById("cameraButton").onclick = () => cameraInput.click();
+document.getElementById("galleryButton").onclick = () => galleryInput.click();
+
+cameraInput.onchange = handleFile;
+galleryInput.onchange = handleFile;
+
+function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Please select an image.");
+    return;
+  }
+
+  uploadedFile = file;
+
+  const url = URL.createObjectURL(file);
+  preview.src = url;
+  preview.style.display = "block";
+  uploadContent.style.display = "none";
+
+  problem.textContent = "Image uploaded: " + file.name +
+    "\nConnect your OCR service to extract the question automatically.";
+
+  steps.innerHTML = `
+    <div class="empty">
+      Image ready. Connect the AI backend to analyse this question.
+    </div>`;
+}
+
+// DRAG AND DROP
+
+dropArea.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropArea.classList.add("dragover");
+});
+
+dropArea.addEventListener("dragleave", () => {
+  dropArea.classList.remove("dragover");
+});
+
+dropArea.addEventListener("drop", e => {
+  e.preventDefault();
+  dropArea.classList.remove("dragover");
+
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  galleryInput.files = transfer.files;
+
+  handleFile({target: galleryInput});
+});
+
+// SOLUTION GENERATION
+
+async function solveQuestion() {
+  const button = document.getElementById("solveButton");
+
+  if (!uploadedFile && !currentQuestion) {
+    addMessage("bot", "Upload a homework image first, or tell me your question in the chat.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Analysing...";
+
+  steps.innerHTML = `<div class="empty">Working on your solution...</div>`;
+
+  try {
+    // BACKEND CONNECTION POINT:
+    // Send uploadedFile to your own secure AI backend.
+    // The backend should handle OCR and AI analysis.
+    //
+    // Example:
+    // const formData = new FormData();
+    // formData.append("image", uploadedFile);
+    // const response = await fetch("/api/solve", {
+    //   method: "POST",
+    //   body: formData
+    // });
+    // const result = await response.json();
+    // renderSolution(result);
+
+    await new Promise(resolve => setTimeout(resolve, 900));
+
+    steps.innerHTML = `
+      <div class="step">
+        <div class="step-number">DEMO MODE</div>
+        <p>Your website interface is working. The AI solving service is not connected yet.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">NEXT STEP</div>
+        <p>Connect an OCR service to read the image, then an AI backend to generate the explanation.</p>
+      </div>`;
+
+  } catch (error) {
+    steps.innerHTML = `<div class="empty">Something went wrong. Please try again.</div>`;
+  } finally {
+    button.disabled = false;
+    button.textContent = "✦ Solve question";
+  }
+}
+
+document.getElementById("solveButton").onclick = solveQuestion;
+
+document.getElementById("regenerateButton").onclick = () => {
+  solveQuestion();
+};
+
+// CHAT
+
+function addMessage(type, text) {
+  const message = document.createElement("div");
+  message.className = "message " + type;
+  message.textContent = text;
+  chatBody.appendChild(message);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+document.getElementById("chatForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  addMessage("user", text);
+  input.value = "";
+
+  // BACKEND CONNECTION POINT:
+  // Send the question and study context to your AI backend.
+  // Do not place private API keys in this frontend.
+
+  addMessage("bot",
+    "I've received your question! The AI assistant will be able to answer once we connect the backend.");
+});
+</script>
+
+</body>
+</html>
